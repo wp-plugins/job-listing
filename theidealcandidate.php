@@ -4,33 +4,38 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Widget display plugin for jobs on The Ideal Candidate
 Author: The Ideal Candidate
-Version: 1.0
+Version: 1.1
 Author URI: http://www.theidealcandidate.com
 */
 
 /**
  * The Ideal Candidate Widget Class
  *
- * @copyright  2009 The Ideal Candidate
- * @license    GPL v2.0
- * @version    1.0
- * @link       http://www.theidealcandidate.com/
- * @since      File available since Release 1.0
+ * @copyright 2009 The Ideal Candidate
+ * @license GPL v2.0
+ * @author Steven Raynham
+ * @version 1.0
+ * @link http://www.theidealcandidate.com/
+ * @since File available since Release 1.0
  */
 
 /**
  * Base The Ideal Candidate Widget Class 
  *
- * @copyright  2009 The Ideal Candidate
- * @license    GPL v2.0
- * @version    1.0
- * @link       http://www.theidealcandidate.com/
- * @since      File available since Release 1.0
+ * @copyright 2009 The Ideal Candidate
+ * @license GPL v2.0
+ * @author Steven Raynham
+ * @version 1.0
+ * @link http://www.theidealcandidate.com/
+ * @since File available since Release 1.0
  */
 class TheIdealCandidate
 {
     /**
      * Construct the widget
+     *
+     * @author Steven Raynham
+     * @since 1.0
      *
      * @param void
      * @return null
@@ -42,6 +47,9 @@ class TheIdealCandidate
 
     /**
      * Initiate the widget
+     *
+     * @author Steven Raynham
+     * @since 1.0
      *
      * @param void
      * @return null
@@ -55,6 +63,9 @@ class TheIdealCandidate
     /**
      * Output the widget to the sidebar
      *
+     * @author Steven Raynham
+     * @since 1.0
+     *
      * @param void
      * @return stdout
      */
@@ -67,6 +78,9 @@ class TheIdealCandidate
 
     /**
      * Create the widget control in the admin
+     *
+     * @author Steven Raynham
+     * @since 1.0
      *
      * @param void
      * @return stdout
@@ -108,12 +122,16 @@ class TheIdealCandidate
     /**
      * Get the affiliate's widgets
      *
+     * @author Steven Raynham
+     * @since 1.0
+     *
      * @param string $email
      * @return mixed
      */
     public function getAffiliateWidgets($email)
     {
         $xml = file_get_contents('http://www.theidealcandidate.com/affxml.php?waemail=' . $email);
+
         $xmlElements = simplexml_load_string($xml);
         if (count($xmlElements->widget)>0) {
             foreach ($xmlElements->widget as $widget) {
@@ -126,3 +144,21 @@ class TheIdealCandidate
     }
 }
 $theIdealCandidate = new TheIdealCandidate;
+
+require_once "simplexml.class.php";
+
+/**
+ * Add simplexml function for PHP4 compatibility
+ *
+ * @author Taha Paksu, http://www.tahapaksu.com/
+ * @since 1.0
+ *
+ * @param string $file
+ * @return mixed
+ */
+if (!function_exists('simplexml_load_file')) {
+    function simplexml_load_file($file) {
+        $sx = new simplexml;
+        return $sx->xml_load_file($file);
+    }
+}
