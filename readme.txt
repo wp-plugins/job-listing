@@ -1,6 +1,6 @@
 === Job Listing ===
 Contributors: businessxpand
-Tags: widgets, affiliate, jobs, careers
+Tags: widget, affiliate, job, career
 Requires at least: 2.2.3
 Tested up to: 2.7.1
 Stable tag: 1.0
