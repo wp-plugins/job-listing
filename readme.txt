@@ -1,5 +1,5 @@
 === Job Listing ===
-Contributors: businessxpand
+Contributors: sraynham
 Tags: widget, affiliate, job, career
 Requires at least: 2.2.3
 Tested up to: 2.7.1
