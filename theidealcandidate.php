@@ -213,9 +213,9 @@ class TheIdealCandidate
         echo '<li>tic-style.css</li>';
         echo '</ul>';
         echo 'Fields that can be used in the tic-joblist.php file are as follows:<br/>';
-        echo '$jobs->jobtile, $jobs->companyname, $jobs->location, $jobs->country, $jobs->category, $jobs->description, $jobs->summary, $jobs->apply, $jobs->about<br/><br/>';
+        echo '$job->jobtile, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->summary, $job->apply, $job->about<br/><br/>';
         echo 'Fields that can be used in the tic-jobdetail.php file are as follows:<br/>';
-        echo '$jobs->jobtile, $jobs->companyname, $jobs->location, $jobs->country, $jobs->category, $jobs->description, $jobs->apply, $jobs->about<br/><br/>';
+        echo '$job->jobtile, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->apply, $job->about, $job->link<br/><br/>';
         echo '</p>';
     }
 
