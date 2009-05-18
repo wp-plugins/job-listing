@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in you content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 2.1
+Version: 2.2
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -300,7 +300,7 @@ class TheIdealCandidate
      * Retrieve XML file
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 2.2
      *
      * @param void
      * @return null
@@ -310,11 +310,11 @@ class TheIdealCandidate
         global $wpdb;
         $doRetrieveXmlFile = false;
         if (($update=get_option('tic_update'))!==false) {
-            $timeDifference = time() - (int)$update;
+            $doRetrieveXmlFile = true;
+/*            $timeDifference = time() - (int)$update;
             if ($timeDifference>=3600) {
                 update_option('tic_update', time());
-                $doRetrieveXmlFile = true;
-            }
+            }*/
         } else {
             add_option('tic_update', time());
             $doRetrieveXmlFile = true;

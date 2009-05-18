@@ -3,7 +3,7 @@ Contributors: sraynham
 Tags: widget, affiliate, job, career
 Requires at least: 2.5.1
 Tested up to: 2.7.1
-Stable tag: 2.1
+Stable tag: 2.2
 
 Create a fully customisable job board for your WordPress site.
 
@@ -11,9 +11,13 @@ Create a fully customisable job board for your WordPress site.
 
 Allows you to create a fully customisable job board for your Wordpress site. You will get an affiliate id which would give you commission for any employer who posts a job.
 
+**Bug fixes for 2.2**
+
+* Fix for initially registering affiliates not retrieving a job list.
+
 **Bug fixes for 2.1**
 
-* Updated functions for PHP4 compatibility
+* Updated functions for PHP4 compatibility.
 
 **New features for version 2.0**
 
