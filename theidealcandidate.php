@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in you content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 2.0
+Version: 2.1
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -14,7 +14,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.0
+ * @version 2.1
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -25,7 +25,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.0
+ * @version 2.1
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -35,12 +35,12 @@ class TheIdealCandidate
      * Construct the plugin/widget
      *
      * @author Steven Raynham
-     * @since 1.0
+     * @since 2.1
      *
      * @param void
      * @return null
      */
-    public function __construct()
+    function TheIdealCandidate()
     {
         if (is_admin()) {
             add_action('init',array(&$this,'adminInit'));
@@ -61,7 +61,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function adminInit()
+    function adminInit()
     {
     }
 
@@ -74,7 +74,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function adminMenu()
+    function adminMenu()
     {
         add_menu_page("Ideal Candidate", "Ideal Candidate", "level_7", __FILE__, array(&$this,'pluginAdmin'));
     }
@@ -88,7 +88,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function adminHead()
+    function adminHead()
     {
         echo '<link rel="stylesheet" href="' . get_option('siteurl') . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/style.css" type="text/css" />'."\r\n";
     }
@@ -102,7 +102,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function head()
+    function head()
     {
         echo '<link rel="stylesheet" href="' . get_option('siteurl') . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/tic-style.css" type="text/css" />'."\r\n";
     }
@@ -116,7 +116,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function pluginAdmin()
+    function pluginAdmin()
     {
         $options = get_option('tic_widget');
         $pluginBase = wp_create_nonce(plugin_basename(__FILE__));
@@ -229,7 +229,7 @@ class TheIdealCandidate
      * @param string $password
      * @return bool
      */
-    public function checkAffiliate($email, $password)
+    function checkAffiliate($email, $password)
     {
         $data = array('u' => $email,
                       'p' => $password,
@@ -249,7 +249,7 @@ class TheIdealCandidate
      * @param string $password
      * @return bool
      */
-    public function registerAffiliate($email, $password, $url)
+    function registerAffiliate($email, $password, $url)
     {
         $data = array('u' => $email,
                       'p' => $password,
@@ -273,7 +273,7 @@ class TheIdealCandidate
      * @param void
      * @return object
      */
-    public function postXmlRequest()
+    function postXmlRequest()
     {
         $options = get_option('tic_widget');
         $email = $options['paypal'];
@@ -305,7 +305,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function retrieveXmlFile()
+    function retrieveXmlFile()
     {
         global $wpdb;
         $doRetrieveXmlFile = false;
@@ -362,7 +362,7 @@ class TheIdealCandidate
      * @param void
      * @return object
      */
-    public function convertXmlMysqlDatetime($datetime)
+    function convertXmlMysqlDatetime($datetime)
     {
         return str_replace('T', ' ', $datetime);
     }
@@ -376,7 +376,7 @@ class TheIdealCandidate
      * @param void
      * @return object
      */
-    public function cleanXml($xml)
+    function cleanXml($xml)
     {
         $return = trim($xml, " \t\n\r\0\x0B0123456789abcdefABCDEF");
         return $return;
@@ -391,7 +391,7 @@ class TheIdealCandidate
      * @param void
      * @return object
      */
-    public function content($content)
+    function content($content)
     {
         $pattern = '/\[(\s*)(tic-job-list)(\s*)(.*)(\s*)\]/i';
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
@@ -421,7 +421,7 @@ class TheIdealCandidate
      * @param array $request
      * @return string
      */
-    public function getJobTable($request)
+    function getJobTable($request)
     {
         global $wpdb;
         $options = get_option('tic_widget');
@@ -460,7 +460,7 @@ class TheIdealCandidate
      * @param array $request
      * @return string
      */
-    public function getJobDetail($id = '')
+    function getJobDetail($id = '')
     {
         global $wpdb;
         if (is_numeric($id)) {
@@ -494,7 +494,7 @@ class TheIdealCandidate
      * @param array $request
      * @return string
      */
-    public function getPagination($pageNumber = 1, $totalNumberOfPages = 1)
+    function getPagination($pageNumber = 1, $totalNumberOfPages = 1)
     {
         global $wpdb;
         $options = get_option('tic_widget');
@@ -546,7 +546,7 @@ class TheIdealCandidate
      * @param string $query
      * @return string
      */
-    public function getSqlWhere($query)
+    function getSqlWhere($query)
     {
         $sql = '';
         $query = trim($query);
@@ -574,7 +574,7 @@ class TheIdealCandidate
      * @param int $pageNumber
      * @return string
      */
-    public function getSqlLimits($pageNumber = 1,$where)
+    function getSqlLimits($pageNumber = 1,$where)
     {
         global $wpdb;
         $options = get_option('tic_widget');
@@ -600,7 +600,7 @@ class TheIdealCandidate
      * @param void
      * @return null
      */
-    public function widgetInit()
+    function widgetInit()
     {
         register_sidebar_widget('The Ideal Candidate', array(&$this,'widgetSidebar'));
         register_widget_control('The Ideal Candidate', array(&$this,'widgetControl'));
@@ -615,7 +615,7 @@ class TheIdealCandidate
      * @param void
      * @return stdout
      */
-    public function widgetSidebar()
+    function widgetSidebar()
     {
         $options = get_option("tic_widget");
         $output = '<script type="text/javascript" src="http://www.theidealcandidate.com/widget/display-'.$options['widget'].'.js"></script>'."\r\n";
@@ -631,7 +631,7 @@ class TheIdealCandidate
      * @param void
      * @return stdout
      */
-    public function widgetControl()
+    function widgetControl()
     {
         $options = get_option('tic_widget');
         if ($_POST['tic_widget_submit']) {
@@ -669,7 +669,7 @@ class TheIdealCandidate
      * @param string $email
      * @return mixed
      */
-    public function getAffiliateWidgets($email)
+    function getAffiliateWidgets($email)
     {
         $xml = file_get_contents('http://www.theidealcandidate.com/affxml.php?waemail=' . $email);
         $xmlElements = simplexml_load_string($xml);
