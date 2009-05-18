@@ -2,7 +2,7 @@
 Contributors: sraynham
 Tags: widget, affiliate, job, career
 Requires at least: 2.5.1
-Tested up to: 2.7.1
+Tested up to: 2.8 beta 1
 Stable tag: 2.3
 
 Create a fully customisable job board for your WordPress site.
