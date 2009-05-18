@@ -1,0 +1,58 @@
+div.tic-joblist {
+}
+
+div.tic-joblist table {
+}
+
+div.tic-joblist tr {
+}
+
+div.tic-joblist td {
+    padding:10px 5px 0 0;
+    vertical-align:top;
+}
+
+div.tic-search-container {
+}
+
+div.tic-search-container label {
+}
+
+div.tic-search-container input {
+}
+
+div.tic-pagination {
+    text-align:center;
+}
+
+div.tic-pagination span.tic-page-number {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-number a {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-number a:hover {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-current {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-previous {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-previous {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-next a {
+    padding:2px;
+}
+
+div.tic-pagination span.tic-page-next a:hover {
+    padding:2px;
+}

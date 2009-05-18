@@ -1,0 +1,13 @@
+div#tic_admin {
+}
+
+div#tic_admin label {
+    display:block;
+    float:left;
+    padding:7px 7px 0 0;
+    text-align:right;
+    width:180px;
+}
+
+div#tic_admin input {
+}
