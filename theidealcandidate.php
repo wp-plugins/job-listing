@@ -2,7 +2,7 @@
 /*
 Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
-Description: Shows jobs in you content and your widgets from The Ideal Candidate
+Description: Shows jobs in your content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
 Version: 2.3
 Author URI: http://www.theidealcandidate.com
