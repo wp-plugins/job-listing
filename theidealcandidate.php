@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in your content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 2.3
+Version: 2.3.1
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -14,7 +14,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.1
+ * @version 2.3.1
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -743,8 +743,8 @@ if (!function_exists('simplexml_load_file'))
 /**
  * Post request function
  *
- * @author Jonas John, http://www.jonasjohn.de/snippets/php/post-request.htm
- * @since 2.0
+ * @author Jonas John, http://www.jonasjohn.de/snippets/php/post-request.htm, Steven Raynham
+ * @since 2.3.1
  *
  * @param string $url
  * @param string $referer
@@ -797,6 +797,7 @@ function postRequest($url, $referer, $_data) {
  
     $header = isset($result[0]) ? $result[0] : '';
     $content = isset($result[1]) ? $result[1] : '';
+    $content = trim( $content, '0123456789' );
     // return as array:
     return array($header, $content);
 }
