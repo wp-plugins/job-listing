@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in your content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 2.3.1
+Version: 2.3.2
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -14,7 +14,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.3.1
+ * @version 2.3.2
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -235,7 +235,7 @@ class TheIdealCandidate
                       'p' => $password,
                       'authorized' => '1');
         list($header, $xml) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = simplexml_load_string($xml);
+        $xmlElements = @simplexml_load_string($xml);
         return $xmlElements;
     }
 
@@ -256,7 +256,7 @@ class TheIdealCandidate
                       'w' => $url,
                       'register' => '1');
         list($header, $xml) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = simplexml_load_string($xml);
+        $xmlElements = @simplexml_load_string($xml);
         if ($xmlElements->response==1) {
             return true;
         } else {
@@ -292,7 +292,7 @@ class TheIdealCandidate
                       'p' => $password,
                       'xml' => urlencode($xml));
         list($header, $xmlResponse) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = simplexml_load_string($xmlResponse);
+        $xmlElements = @simplexml_load_string($xmlResponse);
         return $xmlElements;
     }
 
@@ -326,7 +326,7 @@ class TheIdealCandidate
                           'download' => '1');
             list($header, $xmlResponse) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
             $cleanedXml = $this->cleanXml($xmlResponse);
-            $xmlElements = simplexml_load_string($cleanedXml);
+            $xmlElements = @simplexml_load_string($cleanedXml);
             if (count($xmlElements)>0) {
                 $queries[] = "TRUNCATE " . $wpdb->prefix . "tic;";
                 foreach ($xmlElements->job as $job) {
@@ -672,7 +672,7 @@ class TheIdealCandidate
     function getAffiliateWidgets($email)
     {
         $xml = file_get_contents('http://www.theidealcandidate.com/affxml.php?waemail=' . $email);
-        $xmlElements = simplexml_load_string($xml);
+        $xmlElements = @simplexml_load_string($xml);
         if (count($xmlElements->widget)>0) {
             foreach ($xmlElements->widget as $widget) {
                 $return[(int)$widget->id] = (string)$widget->name;
@@ -683,7 +683,7 @@ class TheIdealCandidate
         return $return;
     }
 }
-$theIdealCandidate = new TheIdealCandidate;
+new TheIdealCandidate;
 
 /**
  * Plugin activation
@@ -744,7 +744,7 @@ if (!function_exists('simplexml_load_file'))
  * Post request function
  *
  * @author Jonas John, http://www.jonasjohn.de/snippets/php/post-request.htm, Steven Raynham
- * @since 2.3.1
+ * @since 2.3.2
  *
  * @param string $url
  * @param string $referer
@@ -797,7 +797,8 @@ function postRequest($url, $referer, $_data) {
  
     $header = isset($result[0]) ? $result[0] : '';
     $content = isset($result[1]) ? $result[1] : '';
-    $content = trim( $content, '0123456789' );
+    preg_match( '/<.*>/im', $content, $matches );
+    $content = $matches[0];
     // return as array:
     return array($header, $content);
 }
