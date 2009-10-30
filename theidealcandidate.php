@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in your content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 2.3.2
+Version: 3.0
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -14,13 +14,13 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.3.2
+ * @version 3.0
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
 
 /**
- * Base The Ideal Candidate Widget Class 
+ * The Ideal Candidate Widget Class 
  *
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
@@ -46,23 +46,36 @@ class TheIdealCandidate
             add_action('init',array(&$this,'adminInit'));
             add_action('admin_menu',array(&$this,'adminMenu'));
             add_action('admin_head',array(&$this,'adminHead'));
+        } else {
+            add_action('init',array(&$this,'wpInit'));
+            add_filter('the_content', array(&$this, 'content'));
+            add_action('wp_head',array(&$this,'head'));
         }
-        add_filter('the_content', array(&$this, 'content'));
         add_action('plugins_loaded',array(&$this,'widgetInit'));
-        add_action('wp_head',array(&$this,'head'));
     }
 
     /**
      * Initiate the plugin
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param void
      * @return null
      */
     function adminInit()
     {
+        global $wpdb;
+        if ($wpdb->get_var("SHOW TABLES LIKE '".$wpdb->prefix."tic'") != $wpdb->prefix."tic") {
+            $sql = "DROP TABLE `".$wpdb->prefix."tic`;";
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
+    }
+
+    function wpInit()
+    {
+        @session_start();
     }
 
     /**
@@ -104,7 +117,10 @@ class TheIdealCandidate
      */
     function head()
     {
-        echo '<link rel="stylesheet" href="' . get_option('siteurl') . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/tic-style.css" type="text/css" />'."\r\n";
+        if ( file_exists( get_stylesheet_directory() . '/tic-style.css' ) )
+            echo '<link rel="stylesheet" href="' . get_stylesheet_directory_uri() . '/tic-style.css" type="text/css" media="screen"/>' . "\r\n";
+        else
+            echo '<link rel="stylesheet" href="' . WP_PLUGIN_URL . '/' . str_replace( basename( __FILE__ ), '', plugin_basename( __FILE__ ) ) . '/tic-style.css" type="text/css" media="screen"/>'."\r\n";
     }
 
     /**
@@ -134,8 +150,6 @@ class TheIdealCandidate
                         } else {
                             add_option('tic_widget', $options);
                         }
-                        $this->postXmlRequest();
-                        $this->retrieveXmlFile(true);
                         break;
                  }
             }
@@ -143,7 +157,7 @@ class TheIdealCandidate
         $checkAffiliate = $this->checkAffiliate($options['paypal'], $options['password']);
         if ($checkAffiliate->email==0) {
             if ((isset($options['paypal'])) && (trim($options['paypal'])!='')) {
-                $this->registerAffiliate($options['paypal'], $options['password'], $_SERVER['HTTP_HOST']);
+                $this->registerAffiliate($options['paypal'], $options['password'], get_option( 'siteurl' ));
                 $checkAffiliate = $this->checkAffiliate($options['paypal'], $options['password']);
             }
         }
@@ -163,8 +177,8 @@ class TheIdealCandidate
         if (($checkAffiliate->email==1) && ($checkAffiliate->password==1)) {
             echo '<h3>Display parameters</h3>'."\r\n";
             //echo '<p>Values entered below will return only jobs that contain these values.</p>'."\r\n";
-            echo '<label for="tic_numjobs">Number of jobs per page</label>'."\r\n";
-            echo '<input type="text" name="tic_numjobs" id="tic_numjobs" value="' . $options['numjobs'] . '"/><br/>'."\r\n";
+            //echo '<label for="tic_numjobs">Number of jobs per page</label>'."\r\n";
+            //echo '<input type="text" name="tic_numjobs" id="tic_numjobs" value="' . $options['numjobs'] . '"/><br/>'."\r\n";
             echo '<label for="tic_summary">Characters in summary</label>'."\r\n";
             echo '<input type="text" name="tic_summary" id="tic_summary" value="' . $options['summary'] . '"/><br/>'."\r\n";
             echo '<h3>Filter parameters</h3>'."\r\n";
@@ -206,16 +220,16 @@ class TheIdealCandidate
         echo '<strong>Showing your job list</strong><br/>';
         echo 'Enter the number of jobs you would like to display per page, and the number of characters you would like to show in the description summary.<br/><br/>';
         echo '<strong>Important:</strong> You will need to create a page or post with the following tag in it\'s content<br/>[tic-job-list]<br/>to display the job board.<br/><br/>';
-        echo 'The way the job list is displayed can be customised further through the following templates, you will need some HTML/CSS knowledge to do this. The template files are as follows:';
+        echo 'The way the job list is displayed can be customised further through the following templates, you will need some HTML/CSS knowledge to do this. The template files are as follows, it is advised you copy these to your current theme folder to ensure updates don\'t overwrite your customisations:';
         echo '<ul>';
         echo '<li>tic-joblist.php</li>';
         echo '<li>tic-jobdetail.php</li>';
         echo '<li>tic-style.css</li>';
         echo '</ul>';
         echo 'Fields that can be used in the tic-joblist.php file are as follows:<br/>';
-        echo '$job->jobtile, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->summary, $job->apply, $job->about<br/><br/>';
+        echo '$job->jobtitle, $job->published, $job->expires, $job->link, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->salary, $job->name, $job->email, $job->url, $job->summary, $job->apply, $job->about, $job->googlemap<br/><br/>';
         echo 'Fields that can be used in the tic-jobdetail.php file are as follows:<br/>';
-        echo '$job->jobtile, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->apply, $job->about, $job->link<br/><br/>';
+        echo '$job->jobtitle, $job->published, $job->expires, $job->link, $job->companyname, $job->location, $job->country, $job->category, $job->description, $job->salary, $job->name, $job->email, $job->url, $job->apply, $job->about, $job->googlemap<br/><br/>';
         echo '</p>';
     }
 
@@ -223,7 +237,7 @@ class TheIdealCandidate
      * Check the affiliate exists
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param string $email
      * @param string $password
@@ -232,10 +246,9 @@ class TheIdealCandidate
     function checkAffiliate($email, $password)
     {
         $data = array('u' => $email,
-                      'p' => $password,
-                      'authorized' => '1');
-        list($header, $xml) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = @simplexml_load_string($xml);
+                      'p' => $password );
+        list($header, $xml) = postRequest('http://www.theidealcandidate.com/aff/authorised.xml', $_SERVER['HTTP_HOST'], $data);
+        $xmlElements = @simplexml_load_string( $this->cleanXml( $xml ) );
         return $xmlElements;
     }
 
@@ -243,7 +256,7 @@ class TheIdealCandidate
      * Check the affiliate exists
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param string $email
      * @param string $password
@@ -254,9 +267,10 @@ class TheIdealCandidate
         $data = array('u' => $email,
                       'p' => $password,
                       'w' => $url,
-                      'register' => '1');
-        list($header, $xml) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = @simplexml_load_string($xml);
+                      'ft' => 'wordpress',
+                      'fn' => get_option( 'blogname' ) );
+        list($header, $xml) = postRequest('http://www.theidealcandidate.com/aff/register.xml', $_SERVER['HTTP_HOST'], $data);
+        $xmlElements = @simplexml_load_string( $this->cleanXml( $xml ) );
         if ($xmlElements->response==1) {
             return true;
         } else {
@@ -265,92 +279,48 @@ class TheIdealCandidate
     }
 
     /**
-     * Upload XML request
+     * Retreive the XML feed
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
-     * @param void
+     * @param integer $jobId
      * @return object
      */
-    function postXmlRequest()
+    function postXmlRequest( $jobId = null, $additionalSearchArray = null )
     {
-        $options = get_option('tic_widget');
+        $options = get_option( 'tic_widget' );
         $email = $options['paypal'];
         unset($options['paypal']);
         $password = $options['password'];
         unset($options['password']);
         unset($options['numjobs']);
         unset($options['summary']);
-        $xml = '<?xml version=\'1.0\'?>'."\r\n";
-        $xml .= '<search>'."\r\n";
-        foreach ($options as $key => $value) {
-            $xml .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>'."\r\n";
+        $xml = '<?xml version=\'1.0\'?>';
+        $xml .= '<search>';
+        if ( isset( $jobId ) ) {
+            $xml .= '<jobid>' . $jobId . '</jobid>';
+        } else {
+            foreach ($options as $key => $value) {
+                if ( !empty( $value ) ) $xml .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>';
+            }
+            if ( isset( $additionalSearchArray ) ) {
+                foreach ( $additionalSearchArray as $key => $value ) {
+                    if ( !empty( $value ) ) $xml .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>';
+                }
+            }
         }
-        $xml .= '</search>'."\r\n";
+        $xml .= '</search>';
         $data = array('u' => $email,
                       'p' => $password,
-                      'xml' => urlencode($xml));
-        list($header, $xmlResponse) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-        $xmlElements = @simplexml_load_string($xmlResponse);
+                      'xml' => urlencode($xml),
+                      'w' => get_option( 'siteurl' ),
+                      'ft' => 'wordpress',
+                      'fn' => get_option( 'blogname' ),
+                      'uid' => md5( session_id() ) );
+        list($header, $xmlResponse) = postRequest('http://www.theidealcandidate.com/aff/download.xml', $_SERVER['HTTP_HOST'], $data);
+        $xmlElements = @simplexml_load_string( $this->cleanXml( $xmlResponse ) );
         return $xmlElements;
-    }
-
-    /**
-     * Retrieve XML file
-     *
-     * @author Steven Raynham
-     * @since 2.3
-     *
-     * @param void
-     * @return null
-     */
-    function retrieveXmlFile($admin = false)
-    {
-        global $wpdb;
-        $doRetrieveXmlFile = false;
-        if (($update=get_option('tic_update'))!==false) {
-            $timeDifference = time() - (int)$update;
-            if ($timeDifference>=3600) {
-                update_option('tic_update', time());
-                $doRetrieveXmlFile = true;
-            }
-        } else {
-            add_option('tic_update', time());
-            $doRetrieveXmlFile = true;
-        }
-        if (($doRetrieveXmlFile) || ($admin)) {
-            $options = get_option('tic_widget');
-            $data = array('u' => $options['paypal'],
-                          'p' => $options['password'],
-                          'download' => '1');
-            list($header, $xmlResponse) = postRequest('http://www.theidealcandidate.com/xmldf/index.php', $_SERVER['HTTP_HOST'], $data);
-            $cleanedXml = $this->cleanXml($xmlResponse);
-            $xmlElements = @simplexml_load_string($cleanedXml);
-            if (count($xmlElements)>0) {
-                $queries[] = "TRUNCATE " . $wpdb->prefix . "tic;";
-                foreach ($xmlElements->job as $job) {
-                    $queries[] = "INSERT INTO " . $wpdb->prefix . "tic (id, jobtitle, published, expires, link, companyname, location, country, category, description, salary, about, video, googlemap) VALUES ('" . mysql_real_escape_string($job->id) . "',
-                            '" . mysql_real_escape_string($job->jobtitle) . "',
-                            '" . mysql_real_escape_string($this->convertXmlMysqlDatetime($job->published)) . "',
-                            '" . mysql_real_escape_string($this->convertXmlMysqlDatetime($job->expires)) . "',
-                            '" . mysql_real_escape_string($job->link) . "',
-                            '" . mysql_real_escape_string($job->companyname) . "',
-                            '" . mysql_real_escape_string($job->location) . "',
-                            '" . mysql_real_escape_string($job->country) . "',
-                            '" . mysql_real_escape_string($job->category) . "',
-                            '" . mysql_real_escape_string($job->description) . "',
-                            '" . mysql_real_escape_string($job->salary) . "',
-                            '" . mysql_real_escape_string($job->about) . "',
-                            '" . mysql_real_escape_string($job->video) . "',
-                            '" . mysql_real_escape_string($job->googlemap) . "');";
-                }
-                if ($wpdb->get_var("SHOW TABLES LIKE '".$wpdb->prefix."tic'") != $wpdb->prefix."tic") ticActivate();
-                foreach ($queries as $query) {
-                    $wpdb->query($query);
-                }
-            }
-        }
     }
 
     /**
@@ -371,14 +341,15 @@ class TheIdealCandidate
      * Cleans the XML file
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param void
      * @return object
      */
-    function cleanXml($xml)
+    function cleanXml( $xml )
     {
         $return = trim($xml, " \t\n\r\0\x0B0123456789abcdefABCDEF");
+        $return = $this->removeCDATA( $xml );
         return $return;
     }
 
@@ -386,7 +357,7 @@ class TheIdealCandidate
      * Filter content
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param void
      * @return object
@@ -400,10 +371,9 @@ class TheIdealCandidate
                 if ($match[2]=='tic-job-list') {
                     $search[] = $match[0];
                     if (isset($_GET['ticj'])) {
-                        $replace[] = $this->getJobDetail($_GET['ticj']);
+                        $replace[] = $this->getJobDetail( $_GET['ticj'] );
                     } else {
-                        $this->retrieveXmlFile();
-                        $replace[] = $this->getJobTable($_GET);
+                        $replace[] = $this->getJobTable( $_GET );
                     }
                 }
             }
@@ -416,35 +386,46 @@ class TheIdealCandidate
      * Generate job list template output
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param array $request
      * @return string
      */
-    function getJobTable($request)
+    function getJobTable( $request )
     {
         global $wpdb;
-        $options = get_option('tic_widget');
+        $options = get_option( 'tic_widget' );
         $where = '';
         $limits = '';
-        if (isset($request['ticq'])) $where = $this->getSqlWhere(urldecode($_GET['ticq']));
-        $sqlLimits = $this->getSqlLimits(urldecode($_GET['ticp']),$where);
-        $limits = $sqlLimits['sql'];
-        $totalNumberOfPages = $sqlLimits['pages'];
-        $jobLink = $_SERVER['REQUEST_URI'] . (strpos($_SERVER['REQUEST_URI'],'?')?'&':'?') . 'ticj=';
-        $sql = "SELECT *, CONCAT('" . $jobLink . "',id) as detail, CONCAT(SUBSTRING(description,1," . $options['summary'] . "),'...') as summary FROM " . $wpdb->prefix . "tic" . $where . " ORDER BY published DESC" . $limits . ";";
-        $jobs = $wpdb->get_results($sql);
-        if (count($jobs)>0) {
-            $parseUrl = parse_url(get_bloginfo('stylesheet_directory') . '/tic-joblist.php');
-            $templateFile = str_replace('//', '/', ($_SERVER['DOCUMENT_ROOT'] . $parseUrl['path']));
-            if (!file_exists($templateFile)) {
-                $templateFile = 'tic-joblist.php';
+        if ( isset( $request['ticq'] ) ) {
+            $searchArray = explode( ' ', $request['ticq'] );
+            foreach ( $searchArray as $value ) {
+                $additionalSearchArray['jobtitle'] = $value;
+                $additionalSearchArray['description'] = $value;
             }
+        }
+        if ( isset( $additionalSearchArray ) ) $xmlElements = $this->postXmlRequest( null, $additionalSearchArray );
+        else $xmlElements = $this->postXmlRequest();
+        if ( $xmlElements ) {
+            $jobs['postlink'] = $xmlElements->postlink;
+            foreach ( $xmlElements->job as $job ) {
+                unset( $jobsObject );
+                foreach ( $job as $field => $value ) {
+                    $jobsObject->$field = $value;
+                }
+                $jobsObject->detail = $_SERVER['REQUEST_URI'] . ( strpos( $_SERVER['REQUEST_URI'] , '?' ) ? '&' : '?' ) . 'ticj=' . $jobsObject->id;
+                $jobsObject->summary = substr( $jobsObject->description, 0, $options['summary'] ) . '...';
+                $jobs[] = $jobsObject;
+            }
+            if ( file_exists( get_stylesheet_directory() . '/tic-joblist.php' ) )
+                $templateFile = get_stylesheet_directory() . '/tic-joblist.php';
+            else
+                $templateFile = 'tic-joblist.php';
             ob_start();
             include($templateFile);
             $return = ob_get_contents();
             ob_end_clean();
-            $return .= $this->getPagination($request['ticp'], $totalNumberOfPages);
+            //$return .= $this->getPagination($request['ticp'], $totalNumberOfPages);
         } else {
             $return = 'No jobs';
         }
@@ -455,23 +436,25 @@ class TheIdealCandidate
      * Generate job detail template output
      *
      * @author Steven Raynham
-     * @since 2.0
+     * @since 3.0
      *
      * @param array $request
      * @return string
      */
-    function getJobDetail($id = '')
+    function getJobDetail( $id = null )
     {
         global $wpdb;
-        if (is_numeric($id)) {
-            $sql = "SELECT * FROM " . $wpdb->prefix . "tic WHERE id = '" . $id . "';";
-            $job = $wpdb->get_row($sql);
-            if (count($job)>0) {
-                $parseUrl = parse_url(get_bloginfo('stylesheet_directory') . '/tic-jobdetail.php');
-                $templateFile = str_replace('//', '/', ($_SERVER['DOCUMENT_ROOT'] . $parseUrl['path']));
-                if (!file_exists($templateFile)) {
-                    $templateFile = 'tic-jobdetail.php';
+        if ( is_numeric( $id ) ) {
+            if ( $xmlElements = $this->postXmlRequest( $id ) ) {
+                $job->postlink = $xmlElements->postlink;
+                $xmlElements = (array)$xmlElements->job;
+                foreach ( $xmlElements as $field => $value ) {
+                    $job->$field = $value;
                 }
+                if ( file_exists( get_stylesheet_directory() . '/tic-jobdetail.php' ) )
+                    $templateFile = get_stylesheet_directory() . '/tic-jobdetail.php';
+                else
+                    $templateFile = 'tic-jobdetail.php';
                 ob_start();
                 include($templateFile);
                 $return = ob_get_contents();
@@ -534,60 +517,6 @@ class TheIdealCandidate
         } else {
             $return = '';
         }
-        return $return;
-    }
-
-    /**
-     * Generate where for sql
-     *
-     * @author Steven Raynham
-     * @since 2.0
-     *
-     * @param string $query
-     * @return string
-     */
-    function getSqlWhere($query)
-    {
-        $sql = '';
-        $query = trim($query);
-        if ($query!='') {
-            $sql .= ' WHERE';
-            $queries = explode(' ', $query);
-            if (count($queries)>0) {
-                foreach ($queries as $query) {
-                    if ($sql != ' WHERE') $sql .= ' AND';
-                    $sql .= " (jobtitle LIKE '%" . $query . "%' OR companyname LIKE '%" . $query . "%' OR location LIKE '%" . $query . "%' OR country LIKE '%" . $query . "%' OR category LIKE '%" . $query . "%' OR description LIKE '%" . $query . "%' OR about LIKE '%" . $query . "%')";
-                }
-            } else {
-                $sql .= " jobtitle LIKE '%" . $query . "%' OR companyname LIKE '%" . $query . "%' OR location LIKE '%" . $query . "%' OR country LIKE '%" . $query . "%' OR category LIKE '%" . $query . "%' OR description LIKE '%" . $query . "%' OR about LIKE '%" . $query . "%'";
-            }
-        }
-        return $sql;
-    }
-
-    /**
-     * Generate limits for sql
-     *
-     * @author Steven Raynham
-     * @since 2.0
-     *
-     * @param int $pageNumber
-     * @return string
-     */
-    function getSqlLimits($pageNumber = 1,$where)
-    {
-        global $wpdb;
-        $options = get_option('tic_widget');
-        $numberJobsPerPage = $options['numjobs'];
-        if ($pageNumber <=0 ) $pageNumber = 1;
-        $sql = "SELECT COUNT(id) as jobcount FROM " . $wpdb->prefix . "tic" . $where;
-        $result = $wpdb->get_row($sql);
-        $totalNumberOfPages = ceil($result->jobcount / $numberJobsPerPage);
-        if ($pageNumber>$totalNumberOfPages) $pageNumber = $totalNumberOfPages;
-        $offset = $numberJobsPerPage * ($pageNumber - 1);
-        $sql = ' LIMIT ' . $offset . ', ' . $numberJobsPerPage;
-        $return['sql'] = $sql;
-        $return['pages'] = $totalNumberOfPages;
         return $return;
     }
 
@@ -669,7 +598,7 @@ class TheIdealCandidate
      * @param string $email
      * @return mixed
      */
-    function getAffiliateWidgets($email)
+    function getAffiliateWidgets( $email )
     {
         $xml = file_get_contents('http://www.theidealcandidate.com/affxml.php?waemail=' . $email);
         $xmlElements = @simplexml_load_string($xml);
@@ -682,6 +611,22 @@ class TheIdealCandidate
         }
         return $return;
     }
+
+    /**
+     * Remove CDATA tag from feeds
+     *
+     * @author Steven Raynham
+     * @since 3.0
+     *
+     * @param string $string
+     * @return string
+     */
+    function removeCDATA( $string )
+    {
+        $search = array( '<![CDATA[', ']]>' );
+        $string = str_replace( $search, '', $string );
+        return $string;
+    }
 }
 new TheIdealCandidate;
 
@@ -692,29 +637,6 @@ new TheIdealCandidate;
  * @return null 
  */
 function ticActivate() {
-    global $wpdb;
-    if ($wpdb->get_var("SHOW TABLES LIKE '".$wpdb->prefix."tic'") != $wpdb->prefix."tic") {
-        $sql = "CREATE TABLE `".$wpdb->prefix."tic` (
-                `id` INT(11) UNSIGNED NOT NULL,
-                `jobtitle` VARCHAR(255) DEFAULT NULL,
-                `published` DATETIME NOT NULL,
-                `expires` DATETIME NOT NULL,
-                `link` VARCHAR(255) DEFAULT NULL,
-                `companyname` VARCHAR(255) NOT NULL,
-                `location` VARCHAR(255) NOT NULL,
-                `country` VARCHAR(255) NOT NULL,
-                `category` VARCHAR(255) NOT NULL,
-                `description` TEXT NOT NULL,
-                `salary` VARCHAR(255),
-                `about` TEXT,
-                `video` VARCHAR(255),
-                `googlemap` VARCHAR(255),
-                PRIMARY KEY (`id`),
-                UNIQUE KEY `id` (`id`)
-                );";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
     $options['numjobs'] = 25;
     $options['summary'] = 100;
     add_option('tic_widget', $options);

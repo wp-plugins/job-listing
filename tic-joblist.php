@@ -4,7 +4,7 @@
             <td colspan="2">
                 <div class="tic-search-container">
                     <form method="get">
-                        <label for="tic-search">Search </label><input type="text" name="ticq"/><input type="submit" value="Submit"/>
+                        <label for="tic-search">Search </label><input type="text" name="ticq" value="<?php echo isset( $_GET['ticq'] ) ? $_GET['ticq'] : ''; ?>"/><input type="submit" value="Submit"/>
                     </form>
                 </div>
             </td>
@@ -22,3 +22,5 @@
     <?php } ?>
     </table>
 </div>
+<div>&nbsp;</div>
+<div><a href="<?php echo $jobs['postlink']; ?>">Post your own job on The Ideal Candidate</a></div>
