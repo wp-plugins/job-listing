@@ -2,7 +2,7 @@
 Contributors: businessxpand
 Tags: widget, affiliate, job, career
 Requires at least: 2.5.1
-Tested up to: 2.8.4
+Tested up to: 2.8.5
 Stable tag: 3.0
 
 Create a fully customisable job board for your WordPress site.
