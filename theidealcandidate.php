@@ -4,7 +4,7 @@ Plugin Name: Job Listing
 Plugin URI: http://www.theidealcandidate.com
 Description: Shows jobs in your content and your widgets from The Ideal Candidate
 Author: The Ideal Candidate
-Version: 3.0
+Version: 3.1
 Author URI: http://www.theidealcandidate.com
 */
 
@@ -14,7 +14,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 3.0
+ * @version 3.1
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -25,7 +25,7 @@ Author URI: http://www.theidealcandidate.com
  * @copyright 2009 The Ideal Candidate
  * @license GPL v2.0
  * @author Steven Raynham
- * @version 2.1
+ * @version 3.1
  * @link http://www.theidealcandidate.com/
  * @since File available since Release 1.0
  */
@@ -341,7 +341,7 @@ class TheIdealCandidate
      * Cleans the XML file
      *
      * @author Steven Raynham
-     * @since 3.0
+     * @since 3.1
      *
      * @param void
      * @return object
@@ -349,7 +349,7 @@ class TheIdealCandidate
     function cleanXml( $xml )
     {
         $return = trim($xml, " \t\n\r\0\x0B0123456789abcdefABCDEF");
-        $return = $this->removeCDATA( $xml );
+//        $return = $this->removeCDATA( $xml );
         return $return;
     }
 
@@ -386,7 +386,7 @@ class TheIdealCandidate
      * Generate job list template output
      *
      * @author Steven Raynham
-     * @since 3.0
+     * @since 3.1
      *
      * @param array $request
      * @return string
@@ -411,7 +411,7 @@ class TheIdealCandidate
             foreach ( $xmlElements->job as $job ) {
                 unset( $jobsObject );
                 foreach ( $job as $field => $value ) {
-                    $jobsObject->$field = $value;
+                    $jobsObject->$field = $this->removeCDATA( $value );
                 }
                 $jobsObject->detail = $_SERVER['REQUEST_URI'] . ( strpos( $_SERVER['REQUEST_URI'] , '?' ) ? '&' : '?' ) . 'ticj=' . $jobsObject->id;
                 $jobsObject->summary = substr( $jobsObject->description, 0, $options['summary'] ) . '...';
@@ -436,7 +436,7 @@ class TheIdealCandidate
      * Generate job detail template output
      *
      * @author Steven Raynham
-     * @since 3.0
+     * @since 3.1
      *
      * @param array $request
      * @return string
@@ -449,7 +449,7 @@ class TheIdealCandidate
                 $job->postlink = $xmlElements->postlink;
                 $xmlElements = (array)$xmlElements->job;
                 foreach ( $xmlElements as $field => $value ) {
-                    $job->$field = $value;
+                    $job->$field = $this->removeCDATA( $value );
                 }
                 if ( file_exists( get_stylesheet_directory() . '/tic-jobdetail.php' ) )
                     $templateFile = get_stylesheet_directory() . '/tic-jobdetail.php';

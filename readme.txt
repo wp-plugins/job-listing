@@ -2,8 +2,8 @@
 Contributors: businessxpand
 Tags: widget, affiliate, job, career
 Requires at least: 2.5.1
-Tested up to: 2.8.5
-Stable tag: 3.0
+Tested up to: 2.9.2
+Stable tag: 3.1
 
 Create a fully customisable job board for your WordPress site.
 
@@ -49,6 +49,10 @@ In addition to this you can show your Ideal Candidate widgets in your sidebar. T
 1. Configure the widget, you will need to have set up your account in the main menu.
 
 == Bug Fixes ==
+
+**Bug fixes for 3.1**
+
+* Error interpreting feed from Ideal Candidate website.
 
 **Bug fixes for 2.3.2**
 
